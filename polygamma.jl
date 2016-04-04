@@ -1,50 +1,46 @@
-function rpolyagamma(z::Float64,b::Int64=1;t::Float64=0.64)
+function rpolyagamma(z::Float64,t::Float64=0.64)
 
-  if b==1
-    accept = false;
-    z = z/2;
-    K = pi^2/8 + z^2/2;
-    p = pi/(2K) * exp(-K*t);
-    q = 2*exp(-z)*pinvgauss(t,1/z);
+  accept = false;
+  z = abs(z)/2;
+  K = pi^2/8 + z^2/2;
+  p = pi/(2K) * exp(-K*t);
+  q = 2*exp(-z)*pinvgauss(t,1/z);
+  x::Float64 = 0.0;
 
-    while !accept
-      #generate proposal
-      if rand() < p/(p+q)
-        x = t + randexp()/K;
-      else
-        x = rtinvgauss(1/z,t);
-      end
+  while !accept
+    #generate proposal
+    if rand() < p/(p+q)
+      x = t + randexp()/K;
+    else
+      x = rtinvgauss(1/z,t);
+    end
 
       #iterate sum until accept/reject
-      reject = false;
-      n = 0;
-      s = asterm(x,n);
-      y = s*rand();
-      while !accept & !reject
-        n += 1;
-        if isodd(n)
-          s -= asterm(x,n);
-          accept = y < s;
-        else
-          s += asterm(x,n);
-          reject = y > s;
-        end
+    reject = false;
+    n = 0;
+    s = asterm(x,n);
+    y = s*rand();
+    while !accept & !reject
+      n += 1;
+      if isodd(n)
+        s -= asterm(x,n);
+        accept = y < s;
+      else
+        s += asterm(x,n);
+        reject = y > s;
       end
-
     end
-
-  else #b > 1
-
-    x = 0.0;
-    for i in 1:b
-      x += rpolyagamma(z,1;t);
-    end
-
   end
 
   return x/4.0
-
 end
+
+function rpolyagamma(z::Float64,b::Int64,t::Float64=0.64)
+  x = 0.0;
+  for i in 1:b x += rpolyagamma(z,t); end
+  return x
+end
+
 
 function pinvgauss(x::Float64,μ::Float64,λ::Float64=1.0)
   z = sqrt(λ/x) * (x/μ - 1);
