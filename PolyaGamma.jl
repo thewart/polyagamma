@@ -1,5 +1,11 @@
-function rpolyagamma(z::Float64,t::Float64=0.64)
 
+module PolyaGamma
+
+using StatsBase, StatsFuns
+
+export rpolyagamma
+
+function rpolyagamma(z::Float64,t::Float64=0.64)
   accept = false;
   z = abs(z)/2;
   K = pi^2/8 + z^2/2;
@@ -58,7 +64,6 @@ function asterm(x,n::Int64,t::Float64=0.64)
   return a
 end
 
-
 function rtinvgauss(μ::Float64,t::Float64 = 0.64)
   if μ > t
 
@@ -89,3 +94,4 @@ function rtinvgauss(μ::Float64,t::Float64 = 0.64)
   return x
 end
 
+end
